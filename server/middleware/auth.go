@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/btcsuite/btcd/btcec"
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwt"
 	"github.com/medibloc/panacea-dep-consumer/panacea"
@@ -51,6 +52,8 @@ func (mw *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
+		fmt.Println(oraclePubKey)
+
 		_, err = jwt.Parse(jwtBz, jwt.WithKey(jwa.ES256K, oraclePubKey))
 		if err != nil {
 			http.Error(w, "jwt signature verification failed", http.StatusUnauthorized)
@@ -66,10 +69,10 @@ func (mw *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
 	})
 }
 
-func (mw *JwtAuthMiddleware) queryOracleParams() (string, error) {
+func (mw *JwtAuthMiddleware) queryOracleParams() (*btcec.PublicKey, error) {
 	oraclePubKey, err := mw.panaceaGRPCClient.GetOraclePubKey()
 	if err != nil {
-		return "", fmt.Errorf("failed to query account: %w", err)
+		return nil, fmt.Errorf("failed to query account: %w", err)
 	}
 
 	return oraclePubKey, nil

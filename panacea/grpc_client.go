@@ -3,10 +3,12 @@ package panacea
 import (
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"time"
 
+	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/std"
@@ -22,7 +24,7 @@ type GRPCClient interface {
 	BroadcastTx(txBytes []byte) (*tx.BroadcastTxResponse, error)
 	GetCdc() *codec.ProtoCodec
 	GetChainID() string
-	GetOraclePubKey() (string, error)
+	GetOraclePubKey() (*btcec.PublicKey, error)
 }
 
 var _ GRPCClient = &grpcClient{}
@@ -93,15 +95,25 @@ func (c *grpcClient) GetChainID() string {
 	return c.chainID
 }
 
-func (c *grpcClient) GetOraclePubKey() (string, error) {
+func (c *grpcClient) GetOraclePubKey() (*btcec.PublicKey, error) {
 	client := oracletypes.NewQueryClient(c.conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	response, err := client.Params(ctx, &oracletypes.QueryOracleParamsRequest{})
 	if err != nil {
-		return "", fmt.Errorf("failed to get oracle params info via grpc: %w", err)
+		return nil, fmt.Errorf("failed to get oracle params info via grpc: %w", err)
 	}
 
-	return response.GetParams().OraclePublicKey, nil
+	oraclePublicKeyBytes, err := base64.StdEncoding.DecodeString(response.GetParams().OraclePublicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	oraclePubKey, err := btcec.ParsePubKey(oraclePublicKeyBytes, btcec.S256())
+	if err != nil {
+		return nil, err
+	}
+
+	return oraclePubKey, nil
 }
