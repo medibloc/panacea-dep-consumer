@@ -1,3 +1,3 @@
 package middleware
 
-type ContextKeyAuthenticatedAccountAddress struct{}
+type ContextKeyAuthenticatedOraclePubKey struct{}

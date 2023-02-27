@@ -5,15 +5,21 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/medibloc/panacea-dep-consumer/panacea"
 	"github.com/medibloc/panacea-dep-consumer/server/middleware"
 	"github.com/medibloc/panacea-dep-consumer/server/service/store"
 	log "github.com/sirupsen/logrus"
 )
 
-func Run(listenAddr string) error {
+func Run(listenAddr, grpcAddr, chainID string) error {
 	router := mux.NewRouter()
 
-	jwtAuthMiddleware := middleware.NewJWTAuthMiddleware()
+	grpcClient, err := panacea.NewGRPCClient(grpcAddr, chainID)
+	if err != nil {
+		return err
+	}
+
+	jwtAuthMiddleware := middleware.NewJWTAuthMiddleware(grpcClient)
 
 	store.RegisterHandlers(router)
 

@@ -6,18 +6,23 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwt"
+	"github.com/medibloc/panacea-dep-consumer/panacea"
+	log "github.com/sirupsen/logrus"
 )
 
 type JwtAuthMiddleware struct {
-	// TODO: manage a nonce per account
+	panaceaGRPCClient panacea.GRPCClient
 }
 
-func NewJWTAuthMiddleware() *JwtAuthMiddleware {
-	return &JwtAuthMiddleware{}
+func NewJWTAuthMiddleware(grpcClient panacea.GRPCClient) *JwtAuthMiddleware {
+	return &JwtAuthMiddleware{
+		panaceaGRPCClient: grpcClient,
+	}
 }
 
-func (j *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
+func (mw *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if len(authHeader) == 0 {
@@ -39,13 +44,35 @@ func (j *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
+		oraclePubKey, err := mw.queryOracleParams()
+		if err != nil {
+			log.Error(err)
+			http.Error(w, "cannot query oracle pubkey", http.StatusUnauthorized)
+			return
+		}
+
+		_, err = jwt.Parse(jwtBz, jwt.WithKey(jwa.ES256K, oraclePubKey))
+		if err != nil {
+			http.Error(w, "jwt signature verification failed", http.StatusUnauthorized)
+			return
+		}
+
 		// pass the authenticated account address to next handlers
 		newReq := r.WithContext(
-			context.WithValue(r.Context(), ContextKeyAuthenticatedAccountAddress{}, parsedJWT.Issuer()),
+			context.WithValue(r.Context(), ContextKeyAuthenticatedOraclePubKey{}, parsedJWT.Issuer()),
 		)
 
 		next.ServeHTTP(w, newReq)
 	})
+}
+
+func (mw *JwtAuthMiddleware) queryOracleParams() (string, error) {
+	oraclePubKey, err := mw.panaceaGRPCClient.GetOraclePubKey()
+	if err != nil {
+		return "", fmt.Errorf("failed to query account: %w", err)
+	}
+
+	return oraclePubKey, nil
 }
 
 func parseBearerToken(authHeader string) (string, error) {
