@@ -8,8 +8,11 @@ import (
 )
 
 func main() {
-	flag.String("listenAddr")
-	if err := server.Run("127.0.0.1:8080"); err != nil {
+	httpPtr := flag.String("listenAddr", "", "http server listen address")
+	grpcPtr := flag.String("grpcAddr", "", "grpc server listen address")
+	chainIDPtr := flag.String("chainID", "", "chain ID")
+	flag.Parse()
+	if err := server.Run(*httpPtr, *grpcPtr, *chainIDPtr); err != nil {
 		os.Exit(1)
 	}
 }
