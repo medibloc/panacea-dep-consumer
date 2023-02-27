@@ -2,11 +2,11 @@ package middleware
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/btcsuite/btcd/btcec"
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwt"
 	"github.com/medibloc/panacea-dep-consumer/panacea"
@@ -39,20 +39,18 @@ func (mw *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
 		jwtBz := []byte(jwtStr)
 
 		// parse JWT without signature verification to get payloads for retrieving an auth pubkey
-		parsedJWT, err := jwt.ParseInsecure(jwtBz)
+		_, err = jwt.ParseInsecure(jwtBz)
 		if err != nil {
 			http.Error(w, "invalid jwt", http.StatusUnauthorized)
 			return
 		}
 
-		oraclePubKey, err := mw.queryOracleParams()
+		oraclePubKey, err := mw.queryOracleParams(r.Context())
 		if err != nil {
 			log.Error(err)
 			http.Error(w, "cannot query oracle pubkey", http.StatusUnauthorized)
 			return
 		}
-
-		fmt.Println(oraclePubKey)
 
 		_, err = jwt.Parse(jwtBz, jwt.WithKey(jwa.ES256K, oraclePubKey))
 		if err != nil {
@@ -60,22 +58,21 @@ func (mw *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// pass the authenticated account address to next handlers
 		newReq := r.WithContext(
-			context.WithValue(r.Context(), ContextKeyAuthenticatedOraclePubKey{}, parsedJWT.Issuer()),
+			context.WithValue(r.Context(), ContextOraclePubKey{}, oraclePubKey),
 		)
 
 		next.ServeHTTP(w, newReq)
 	})
 }
 
-func (mw *JwtAuthMiddleware) queryOracleParams() (*btcec.PublicKey, error) {
-	oraclePubKey, err := mw.panaceaGRPCClient.GetOraclePubKey()
+func (mw *JwtAuthMiddleware) queryOracleParams(ctx context.Context) (*ecdsa.PublicKey, error) {
+	oraclePubKey, err := mw.panaceaGRPCClient.GetOraclePubKey(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query account: %w", err)
 	}
 
-	return oraclePubKey, nil
+	return oraclePubKey.ToECDSA(), nil
 }
 
 func parseBearerToken(authHeader string) (string, error) {

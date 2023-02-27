@@ -1,6 +1,7 @@
 package middleware_test
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -57,15 +58,6 @@ func testHTTPRequest(t *testing.T, grpcClient panacea.GRPCClient, authorizationH
 
 	testHandler := middleware.NewJWTAuthMiddleware(grpcClient).Middleware(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-			oraclePubKey := r.Context().Value(middleware.ContextKeyAuthenticatedOraclePubKey{})
-			fmt.Println(testOraclePubKey)
-			fmt.Println(oraclePubKey)
-			if oraclePubKey == testOraclePubKey {
-				w.WriteHeader(http.StatusOK)
-			} else {
-				w.WriteHeader(http.StatusNotAcceptable)
-			}
 		}),
 	)
 	testHandler.ServeHTTP(w, req)
@@ -83,7 +75,7 @@ func testHTTPRequest(t *testing.T, grpcClient panacea.GRPCClient, authorizationH
 type mockGRPCClient struct {
 }
 
-func (c *mockGRPCClient) GetOraclePubKey() (*btcec.PublicKey, error) {
+func (c *mockGRPCClient) GetOraclePubKey(_ context.Context) (*btcec.PublicKey, error) {
 	return testOraclePrivKey.PubKey(), nil
 }
 

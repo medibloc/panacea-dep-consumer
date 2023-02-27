@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/url"
-	"time"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -24,7 +23,7 @@ type GRPCClient interface {
 	BroadcastTx(txBytes []byte) (*tx.BroadcastTxResponse, error)
 	GetCdc() *codec.ProtoCodec
 	GetChainID() string
-	GetOraclePubKey() (*btcec.PublicKey, error)
+	GetOraclePubKey(ctx context.Context) (*btcec.PublicKey, error)
 }
 
 var _ GRPCClient = &grpcClient{}
@@ -95,10 +94,8 @@ func (c *grpcClient) GetChainID() string {
 	return c.chainID
 }
 
-func (c *grpcClient) GetOraclePubKey() (*btcec.PublicKey, error) {
+func (c *grpcClient) GetOraclePubKey(ctx context.Context) (*btcec.PublicKey, error) {
 	client := oracletypes.NewQueryClient(c.conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 
 	response, err := client.Params(ctx, &oracletypes.QueryOracleParamsRequest{})
 	if err != nil {
