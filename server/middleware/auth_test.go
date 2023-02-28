@@ -21,7 +21,6 @@ import (
 
 var (
 	testOraclePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
-	testOraclePubKey     = testOraclePrivKey.PubKey()
 )
 
 func TestAuthSuccess(t *testing.T) {
