@@ -23,14 +23,14 @@ func Run(listenAddr, grpcAddr, chainID string) error {
 
 	store.RegisterHandlers(router)
 
+	router.Use(jwtAuthMiddleware.Middleware)
+
 	server := &http.Server{
 		Handler:      router,
 		Addr:         listenAddr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-
-	router.Use(jwtAuthMiddleware.Middleware)
 
 	log.Infof("HTTP server is started: %s", server.Addr)
 	return server.ListenAndServe()

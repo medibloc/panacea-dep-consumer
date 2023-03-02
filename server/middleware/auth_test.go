@@ -2,6 +2,7 @@ package middleware_test
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"fmt"
 	"io"
 	"net/http"
@@ -24,11 +25,11 @@ var (
 )
 
 func TestAuthSuccess(t *testing.T) {
-	jwt := testGenerateJWT(t, testOraclePrivKey, 10*time.Second)
+	generatedJWT := testGenerateJWT(t, testOraclePrivKey, 10*time.Second)
 	testHTTPRequest(
 		t,
 		&mockGRPCClient{},
-		fmt.Sprintf("Bearer %s", string(jwt)),
+		fmt.Sprintf("Bearer %s", string(generatedJWT)),
 		http.StatusOK,
 		"",
 	)
@@ -57,6 +58,12 @@ func testHTTPRequest(t *testing.T, grpcClient panacea.GRPCClient, authorizationH
 
 	testHandler := middleware.NewJWTAuthMiddleware(grpcClient).Middleware(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			value := r.Context().Value(middleware.ContextOraclePubKey{}).(*ecdsa.PublicKey)
+			if testOraclePrivKey.PubKey().ToECDSA().Equal(value) {
+				w.WriteHeader(http.StatusOK)
+			} else {
+				w.WriteHeader(http.StatusNotAcceptable)
+			}
 		}),
 	)
 	testHandler.ServeHTTP(w, req)

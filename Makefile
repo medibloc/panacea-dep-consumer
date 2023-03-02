@@ -10,7 +10,7 @@ MODULE=github.com/medibloc/panacea-dep-consumer
 .PHONY: build test clean
 
 build: go.sum
-	go build -mod=readonly $(BUILD_FLAGS) -o $(OUT_DIR)/consumer
+	go build -mod=readonly $(BUILD_FLAGS) -o $(OUT_DIR)/dep-consumer
 
 test:
 	go test -v ./...
