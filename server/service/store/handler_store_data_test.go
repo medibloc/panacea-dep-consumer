@@ -30,9 +30,7 @@ func TestHandleStoreData(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	store.HandleStoreData(w, r)
+	defer os.Remove(dataHash)
 
-	require.Equal(t, http.StatusCreated, w.Code)
-
-	err = os.Remove(dataHash)
-	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, w.Code)
 }

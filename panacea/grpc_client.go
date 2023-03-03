@@ -19,10 +19,6 @@ import (
 )
 
 type GRPCClient interface {
-	Close() error
-	BroadcastTx(txBytes []byte) (*tx.BroadcastTxResponse, error)
-	GetCdc() *codec.ProtoCodec
-	GetChainID() string
 	GetOraclePubKey(ctx context.Context) (*btcec.PublicKey, error)
 }
 
