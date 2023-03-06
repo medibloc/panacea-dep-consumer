@@ -69,7 +69,7 @@ func (mw *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
 func (mw *JwtAuthMiddleware) queryOracleParams(ctx context.Context) (*ecdsa.PublicKey, error) {
 	oraclePubKey, err := mw.panaceaGRPCClient.GetOraclePubKey(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query account: %w", err)
+		return nil, fmt.Errorf("failed to query oracle pubkey: %w", err)
 	}
 
 	return oraclePubKey.ToECDSA(), nil

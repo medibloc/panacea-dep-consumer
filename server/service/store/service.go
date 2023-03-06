@@ -7,5 +7,5 @@ import (
 )
 
 func RegisterHandlers(router *mux.Router) {
-	router.HandleFunc("/v1/data/{key}", HandleStoreData).Methods(http.MethodPost)
+	router.HandleFunc("/v1/deals/{dealId}/data/{key}", HandleStoreData).Methods(http.MethodPost)
 }
