@@ -3,11 +3,13 @@ module github.com/medibloc/panacea-dep-consumer
 go 1.19
 
 require (
+	github.com/btcsuite/btcd v0.22.2
 	github.com/cosmos/cosmos-sdk v0.45.12
 	github.com/gorilla/mux v1.8.0
 	github.com/lestrrat-go/jwx/v2 v2.0.8
 	github.com/medibloc/panacea-core/v2 v2.1.0-alpha.3.0.20230220084629-938910c7e927
 	github.com/sirupsen/logrus v1.9.0
+	github.com/stretchr/testify v1.8.1
 	google.golang.org/grpc v1.51.0
 )
 
@@ -19,7 +21,6 @@ require (
 	github.com/armon/go-metrics v0.4.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816 // indirect
-	github.com/btcsuite/btcd v0.22.2 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/confio/ics23/go v0.9.0 // indirect
@@ -90,7 +91,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.14.0 // indirect
-	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7 // indirect
 	github.com/tendermint/btcd v0.1.1 // indirect

@@ -11,7 +11,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/cosmos/cosmos-sdk/types/tx"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -68,18 +67,6 @@ func NewGRPCClient(grpcAddr, chainID string) (GRPCClient, error) {
 func (c *grpcClient) Close() error {
 	log.Info("closing Panacea gRPC connection")
 	return c.conn.Close()
-}
-
-func (c *grpcClient) BroadcastTx(txBytes []byte) (*tx.BroadcastTxResponse, error) {
-	txClient := tx.NewServiceClient(c.conn)
-
-	return txClient.BroadcastTx(
-		context.Background(),
-		&tx.BroadcastTxRequest{
-			Mode:    tx.BroadcastMode_BROADCAST_MODE_BLOCK,
-			TxBytes: txBytes,
-		},
-	)
 }
 
 func (c *grpcClient) GetCdc() *codec.ProtoCodec {
