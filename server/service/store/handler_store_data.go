@@ -79,7 +79,6 @@ func HandleStoreData(w http.ResponseWriter, r *http.Request) {
 		log.Errorf("failed to write response: %s", err.Error())
 		return
 	}
-	return
 }
 
 func writeFile(path, dataHashStr string, body []byte) (*os.File, error) {
