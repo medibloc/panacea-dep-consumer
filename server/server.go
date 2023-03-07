@@ -14,7 +14,7 @@ import (
 func Run(listenAddr, grpcAddr, chainID string) error {
 	router := mux.NewRouter()
 
-	_, err := panacea.NewGRPCClient(grpcAddr, chainID)
+	grpcClient, err := panacea.NewGRPCClient(grpcAddr, chainID)
 	if err != nil {
 		return err
 	}
