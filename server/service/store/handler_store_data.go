@@ -2,7 +2,6 @@ package store
 
 import (
 	"encoding/hex"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -30,6 +29,16 @@ func HandleStoreData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//_, err = io.Copy(w, r.Body)
+	//if err != nil {
+	//	log.Errorf("failed to write the request body: %v", err.Error())
+	//	http.Error(w, "failed to write the request body", http.StatusBadRequest)
+	//}
+	//defer r.Body.Close()
+
+	//pr, pw := io.Pipe()
+	//pr.Read()
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Errorf("failed to read data: %v", err.Error())
@@ -40,64 +49,31 @@ func HandleStoreData(w http.ResponseWriter, r *http.Request) {
 
 	cwd, _ := os.Getwd()
 	path := filepath.Join(cwd, dealIDStr)
-
-	_, err = os.Stat(path)
+	err = os.MkdirAll(path, os.ModePerm)
 	if err != nil {
-		//If the directory does not exist, make directory with dealID.
-		if os.IsNotExist(err) {
-			err = os.Mkdir(dealIDStr, os.ModePerm)
-			if err != nil {
-				log.Errorf("failed to create directory: %v", err.Error())
-				http.Error(w, "failed to create directory", http.StatusInternalServerError)
-				return
-			}
-
-			file, err := writeFile(path, dataHashStr, body)
-			if err != nil {
-				log.Errorf("failed to store data file: %v", err.Error())
-				http.Error(w, "failed to store data file", http.StatusInternalServerError)
-				return
-			}
-			defer file.Close()
-		}
+		log.Errorf(err.Error())
+		return
 	}
 
-	// If the directory exists, just write file with dataHash
-	if os.IsExist(err) {
-		file, err := writeFile(path, dataHashStr, body)
-		if err != nil {
-			log.Errorf("failed to store data file: %v", err.Error())
-			http.Error(w, "failed to store data file", http.StatusInternalServerError)
-			return
-		}
-		defer file.Close()
+	file, err := os.Create(filepath.Join(path, dataHashStr))
+	if err != nil {
+		log.Errorf("failed to create file: %v", err.Error())
+		http.Error(w, "failed to create file", http.StatusInternalServerError)
+		return
 	}
+
+	_, err = w.Write(body)
+	if err != nil {
+		log.Errorf("failed to write file: %v", err.Error())
+		http.Error(w, "failed to write file", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/text")
-	if _, err = w.Write([]byte(fmt.Sprintf("success to store data in %s/", path))); err != nil {
+	if _, err = w.Write([]byte("success to store data")); err != nil {
 		log.Errorf("failed to write response: %s", err.Error())
 		return
 	}
-}
-
-func writeFile(path, dataHashStr string, body []byte) (*os.File, error) {
-	path = filepath.Join(path, dataHashStr)
-
-	file, err := os.Create(path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create file: %v", err.Error())
-	}
-	_, err = file.Write(body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to write data: %v", err.Error())
-	}
-
-	// For overwrite file which has same filename(dataHash).
-	_, err = os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open file: %v", err.Error())
-	}
-
-	return file, nil
 }

@@ -5,8 +5,6 @@ BUILD_FLAGS := -tags "$(build_tags)"
 
 OUT_DIR = ./build
 
-MODULE=github.com/medibloc/panacea-dep-consumer
-
 .PHONY: build test install clean
 
 build: go.sum

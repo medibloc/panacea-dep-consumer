@@ -8,9 +8,6 @@ import (
 	"net/url"
 
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/std"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -24,19 +21,10 @@ type GRPCClient interface {
 var _ GRPCClient = &grpcClient{}
 
 type grpcClient struct {
-	conn    *grpc.ClientConn
-	cdc     *codec.ProtoCodec
-	chainID string
+	conn *grpc.ClientConn
 }
 
-func makeInterfaceRegistry() sdk.InterfaceRegistry {
-	interfaceRegistry := sdk.NewInterfaceRegistry()
-	std.RegisterInterfaces(interfaceRegistry)
-	oracletypes.RegisterInterfaces(interfaceRegistry)
-	return interfaceRegistry
-}
-
-func NewGRPCClient(grpcAddr, chainID string) (GRPCClient, error) {
+func NewGRPCClient(grpcAddr string) (GRPCClient, error) {
 	log.Infof("dialing to Panacea gRPC endpoint: %s", grpcAddr)
 
 	parsedUrl, err := url.Parse(grpcAddr)
@@ -58,23 +46,13 @@ func NewGRPCClient(grpcAddr, chainID string) (GRPCClient, error) {
 	}
 
 	return &grpcClient{
-		conn:    conn,
-		cdc:     codec.NewProtoCodec(makeInterfaceRegistry()),
-		chainID: chainID,
+		conn: conn,
 	}, nil
 }
 
 func (c *grpcClient) Close() error {
 	log.Info("closing Panacea gRPC connection")
 	return c.conn.Close()
-}
-
-func (c *grpcClient) GetCdc() *codec.ProtoCodec {
-	return c.cdc
-}
-
-func (c *grpcClient) GetChainID() string {
-	return c.chainID
 }
 
 func (c *grpcClient) GetOraclePubKey(ctx context.Context) (*btcec.PublicKey, error) {

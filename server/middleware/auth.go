@@ -58,11 +58,7 @@ func (mw *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
-		newReq := r.WithContext(
-			context.WithValue(r.Context(), ContextOraclePubKey{}, oraclePubKey),
-		)
-
-		next.ServeHTTP(w, newReq)
+		next.ServeHTTP(w, r)
 	})
 }
 

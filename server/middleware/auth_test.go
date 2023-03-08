@@ -2,7 +2,6 @@ package middleware_test
 
 import (
 	"context"
-	"crypto/ecdsa"
 	"fmt"
 	"io"
 	"net/http"
@@ -57,14 +56,7 @@ func testHTTPRequest(t *testing.T, grpcClient panacea.GRPCClient, authorizationH
 	w := httptest.NewRecorder()
 
 	testHandler := middleware.NewJWTAuthMiddleware(grpcClient).Middleware(
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			value := r.Context().Value(middleware.ContextOraclePubKey{}).(*ecdsa.PublicKey)
-			if testOraclePrivKey.PubKey().ToECDSA().Equal(value) {
-				w.WriteHeader(http.StatusOK)
-			} else {
-				w.WriteHeader(http.StatusNotAcceptable)
-			}
-		}),
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}),
 	)
 	testHandler.ServeHTTP(w, req)
 

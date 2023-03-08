@@ -10,9 +10,8 @@ import (
 func main() {
 	httpPtr := flag.String("listen-addr", "", "http server listen address")
 	grpcPtr := flag.String("grpc-addr", "", "grpc server listen address")
-	chainIDPtr := flag.String("chain-id", "", "chain ID of Panacea blockchain")
 	flag.Parse()
-	if err := server.Run(*httpPtr, *grpcPtr, *chainIDPtr); err != nil {
+	if err := server.Run(*httpPtr, *grpcPtr); err != nil {
 		os.Exit(1)
 	}
 }
