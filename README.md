@@ -1,10 +1,10 @@
 # panacea-dep-consumer
 
-A HTTP server for DEP(Data Exchange Protocol) consumers which
+A HTTP server for DEP(Data Exchange Protocol) consumers
 
 ## Features
 
-- Request the storing a data to consumer after the oracle verify the data.
+- Request the storing a data to consumer after success to verifying the data from the oracle.
 
 ## Installation
 
