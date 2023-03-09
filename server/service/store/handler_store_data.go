@@ -13,7 +13,7 @@ import (
 )
 
 func HandleStoreData(w http.ResponseWriter, r *http.Request) {
-	dataHashStr := mux.Vars(r)["key"]
+	dataHashStr := mux.Vars(r)["dataHash"]
 	_, err := hex.DecodeString(dataHashStr)
 	if err != nil {
 		log.Errorf("failed to decode dataHash: %s", err.Error())

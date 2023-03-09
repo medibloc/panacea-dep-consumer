@@ -10,8 +10,6 @@ import (
 	"time"
 
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwt"
 	"github.com/medibloc/panacea-dep-consumer/panacea"
@@ -75,18 +73,6 @@ type mockGRPCClient struct {
 
 func (c *mockGRPCClient) GetOraclePubKey(_ context.Context) (*btcec.PublicKey, error) {
 	return testOraclePrivKey.PubKey(), nil
-}
-
-func (c *mockGRPCClient) GetCdc() *codec.ProtoCodec {
-	return nil
-}
-
-func (c *mockGRPCClient) GetChainID() string {
-	return ""
-}
-
-func (c *mockGRPCClient) BroadcastTx(_ []byte) (*tx.BroadcastTxResponse, error) {
-	return nil, nil
 }
 
 func (c *mockGRPCClient) Close() error {

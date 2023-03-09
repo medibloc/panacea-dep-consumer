@@ -45,7 +45,7 @@ func (mw *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
-		oraclePubKey, err := mw.queryOracleParams(r.Context())
+		oraclePubKey, err := mw.queryOraclePublicKey(r.Context())
 		if err != nil {
 			log.Error(err)
 			http.Error(w, "cannot query oracle pubkey", http.StatusUnauthorized)
@@ -62,7 +62,7 @@ func (mw *JwtAuthMiddleware) Middleware(next http.Handler) http.Handler {
 	})
 }
 
-func (mw *JwtAuthMiddleware) queryOracleParams(ctx context.Context) (*ecdsa.PublicKey, error) {
+func (mw *JwtAuthMiddleware) queryOraclePublicKey(ctx context.Context) (*ecdsa.PublicKey, error) {
 	oraclePubKey, err := mw.panaceaGRPCClient.GetOraclePubKey(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query oracle pubkey: %w", err)
