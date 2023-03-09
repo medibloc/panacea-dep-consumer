@@ -23,10 +23,10 @@ func TestHandleStoreData(t *testing.T) {
 	data, err := base64.StdEncoding.DecodeString(encryptedData)
 	require.NoError(t, err)
 
-	r, err := http.NewRequest("POST", "/v1/deals/{dealId}/data/{key}", bytes.NewBuffer(data))
+	r, err := http.NewRequest("POST", "/v1/deals/{dealId}/data/{dataHash}", bytes.NewBuffer(data))
 	require.NoError(t, err)
 
-	r = mux.SetURLVars(r, map[string]string{"dealId": dealId, "key": dataHash})
+	r = mux.SetURLVars(r, map[string]string{"dealId": dealId, "dataHash": dataHash})
 
 	w := httptest.NewRecorder()
 
