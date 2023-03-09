@@ -13,9 +13,10 @@ make build
 make test
 make install
 
-consumerd -listen-addr="" -grpc-addr=""
+consumerd -listen-addr="" -grpc-addr="" -data-dir=""
 # ex) consumerd -listen-addr="127.0.0.1:8080" -grpc-addr="http://127.0.0.1:9090"
-# The `-grpc-addr`values should be with URL scheme such as `http`, `https`.
+# The `-grpc-addr` value should be with URL scheme such as `http`, `https`.
+# The `data-dir` value is the path which the data will be stored.
 ```
 
 ## Request Store a Data
