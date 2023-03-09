@@ -29,24 +29,6 @@ func HandleStoreData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//_, err = io.Copy(w, r.Body)
-	//if err != nil {
-	//	log.Errorf("failed to write the request body: %v", err.Error())
-	//	http.Error(w, "failed to write the request body", http.StatusBadRequest)
-	//}
-	//defer r.Body.Close()
-
-	//pr, pw := io.Pipe()
-	//pr.Read()
-
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Errorf("failed to read data: %v", err.Error())
-		http.Error(w, "failed to read data", http.StatusBadRequest)
-		return
-	}
-	defer r.Body.Close()
-
 	cwd, _ := os.Getwd()
 	path := filepath.Join(cwd, dealIDStr)
 	err = os.MkdirAll(path, os.ModePerm)
@@ -61,14 +43,14 @@ func HandleStoreData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to create file", http.StatusInternalServerError)
 		return
 	}
+	defer file.Close()
 
-	_, err = w.Write(body)
+	_, err = io.Copy(file, r.Body)
 	if err != nil {
 		log.Errorf("failed to write file: %v", err.Error())
 		http.Error(w, "failed to write file", http.StatusInternalServerError)
 		return
 	}
-	defer file.Close()
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/text")
