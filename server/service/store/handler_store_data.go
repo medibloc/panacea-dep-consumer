@@ -29,8 +29,8 @@ func HandleStoreData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cwd, _ := os.Getwd()
-	path := filepath.Join(cwd, dealIDStr)
+	homeDir, _ := os.UserHomeDir()
+	path := filepath.Join(homeDir, dealIDStr)
 	err = os.MkdirAll(path, os.ModePerm)
 	if err != nil {
 		log.Errorf("failed to create directory: %v", err.Error())
