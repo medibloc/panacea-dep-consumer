@@ -14,4 +14,5 @@ func main() {
 	if err := server.Run(*httpPtr, *grpcPtr); err != nil {
 		os.Exit(1)
 	}
+
 }

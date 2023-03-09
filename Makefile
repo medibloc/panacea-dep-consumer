@@ -8,13 +8,13 @@ OUT_DIR = ./build
 .PHONY: build test install clean
 
 build: go.sum
-	go build -mod=readonly $(BUILD_FLAGS) -o $(OUT_DIR)/dep-consumer
+	go build -mod=readonly $(BUILD_FLAGS) -o $(OUT_DIR)/consumerd ./cmd/consumerd
 
 test:
 	go test -v ./...
 
-#install: go.sum
-#	go install -mod=readonly $(BUILD_FLAGS) $(OUT_DIR)/dep-consumer
+install: go.sum
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/consumerd
 
 clean:
 	go clean

@@ -33,7 +33,8 @@ func HandleStoreData(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join(cwd, dealIDStr)
 	err = os.MkdirAll(path, os.ModePerm)
 	if err != nil {
-		log.Errorf(err.Error())
+		log.Errorf("failed to create directory: %v", err.Error())
+		http.Error(w, "failed to create directory", http.StatusInternalServerError)
 		return
 	}
 
@@ -55,7 +56,7 @@ func HandleStoreData(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/text")
 	if _, err = w.Write([]byte("success to store data")); err != nil {
-		log.Errorf("failed to write response: %s", err.Error())
+		log.Errorf("failed to write response: %v", err.Error())
 		return
 	}
 }
