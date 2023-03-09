@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Run(listenAddr, grpcAddr string) error {
+func Run(listenAddr, grpcAddr, dataDir string) error {
 	router := mux.NewRouter()
 
 	grpcClient, err := panacea.NewGRPCClient(grpcAddr)
@@ -21,7 +21,8 @@ func Run(listenAddr, grpcAddr string) error {
 
 	jwtAuthMiddleware := middleware.NewJWTAuthMiddleware(grpcClient)
 
-	store.RegisterHandlers(router)
+	svc := store.NewService(dataDir)
+	svc.RegisterHandlers(router)
 
 	router.Use(jwtAuthMiddleware.Middleware)
 

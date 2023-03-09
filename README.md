@@ -20,7 +20,7 @@ consumerd -listen-addr="" -grpc-addr=""
 
 ## Request Store a Data
 ```bash
-curl -v -X POST "http://${YOUR_HTTP_SERVER}/v1/deals/${dealID}/data/${dataHash}" -H "Authorization: Bearer ${ORACLE_JWT}"
+curl -v -X POST "http://${YOUR_HTTP_SERVER}/v1/deals/${dealID}/data/${dataHash}" -d "@<file-path>" -H "Authorization: Bearer ${ORACLE_JWT}"
 
 ## The ORACLE_JWT is an JWT which is signed by oracle private key.
 ```

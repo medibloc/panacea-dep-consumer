@@ -2,6 +2,7 @@ package store
 
 import (
 	"encoding/hex"
+	"flag"
 	"io"
 	"net/http"
 	"os"
@@ -12,7 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func HandleStoreData(w http.ResponseWriter, r *http.Request) {
+func (s *Service) HandleStoreData(w http.ResponseWriter, r *http.Request) {
 	dataHashStr := mux.Vars(r)["dataHash"]
 	_, err := hex.DecodeString(dataHashStr)
 	if err != nil {
@@ -29,9 +30,9 @@ func HandleStoreData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	homeDir, _ := os.UserHomeDir()
-	path := filepath.Join(homeDir, dealIDStr)
+	path := filepath.Join(s.dataDir, dealIDStr)
 	err = os.MkdirAll(path, os.ModePerm)
+	flag.Args()
 	if err != nil {
 		log.Errorf("failed to create directory: %v", err.Error())
 		http.Error(w, "failed to create directory", http.StatusInternalServerError)
