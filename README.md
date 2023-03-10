@@ -30,3 +30,4 @@ If the storing a data success, the response will show following message:
 success to store data
 ```
 And the data will be stored in `${DATA_DIR}/${dealID}` directory with the file name `${dataHash}`.
+The `${DATA_DIR}` is specified in flag `-data-dir` when starting the service. 
