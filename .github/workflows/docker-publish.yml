@@ -45,9 +45,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      # Build panacea-oracle image with Buildx, and push it except on PR
+      # Build panacea-dep-consumer image with Buildx, and push it except on PR
       # https://github.com/docker/build-push-action
-      - name: Build (and push) panacea-oracle image
+      - name: Build (and push) panacea-dep-consumer image
         uses: docker/build-push-action@v2.6.1
         with:
           context: .
