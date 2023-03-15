@@ -36,8 +36,10 @@ func NewGRPCClient(grpcAddr string) (GRPCClient, error) {
 
 	if parsedUrl.Scheme == "https" {
 		cred = grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{}))
-	} else {
+	} else if parsedUrl.Scheme == "http" || parsedUrl.Scheme == "tcp" {
 		cred = grpc.WithInsecure()
+	} else {
+		return nil, fmt.Errorf("invalid URL scheme: %s", parsedUrl.Scheme)
 	}
 
 	conn, err := grpc.Dial(parsedUrl.Host, cred)
