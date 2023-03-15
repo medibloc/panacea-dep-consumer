@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    # TODO: need to change self-hosted machine and GO env
+
     name: Build & Test
     runs-on: ubuntu-latest
 
