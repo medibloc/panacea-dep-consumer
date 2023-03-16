@@ -9,7 +9,7 @@ COPY . /src/panacea-dep-consumer
 
 WORKDIR /src/panacea-dep-consumer
 
-RUN make clean && make build
+RUN make clean build
 
 FROM debian:bullseye-slim
 
@@ -18,5 +18,3 @@ COPY --from=build-env /src/panacea-dep-consumer/build/consumerd /usr/bin/consume
 RUN chmod +x /usr/bin/consumerd
 
 CMD ["/consumerd"]
-
-EXPOSE 8080
